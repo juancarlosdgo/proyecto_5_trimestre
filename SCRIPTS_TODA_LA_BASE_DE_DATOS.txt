@@ -1,0 +1,156 @@
+create table usuarios(
+	correo_electronico varchar(100) PRIMARY KEY, 
+	contraseña varchar(50)
+);
+
+create table tipo_persona(
+	cod_usuario varchar (10) primary key,
+	nom_tipo_usuario varchar (50)
+);
+
+create table persona (
+	num_doc varchar(10) primary key,
+	tipo_doc varchar(30),
+	nombres varchar(50),
+	apellidos varchar(50),
+	correo_electronico varchar (100),
+	telefono varchar (15),
+	direccion varchar (100),
+	cod_usuario varchar (10),
+	foreign key (correo_electronico) references usuarios(correo_electronico) on delete cascade on update cascade,
+	foreign key (cod_usuario) references tipo_persona(cod_usuario) on delete cascade on update cascade
+);
+
+
+create table tipo_habitacion(
+	cod_tipo_hab varchar(5) primary key,
+	nom_tipo_hab varchar(30),
+	capacidad varchar(20),
+	valor_base float
+);
+
+
+create table habitacion(
+	nro_hab varchar(5) PRIMARY key,
+	cod_tipo_hab varchar (5),
+	estado_hab varchar(12),
+	descripcion_hab varchar(500),
+	Foreign key (cod_tipo_hab) references tipo_habitacion(cod_tipo_hab) on delete cascade on update cascade
+);
+
+
+create table tipo_mobiliario(
+	cod_tipo_mob varchar(5) primary key,
+	nro_hab varchar (5),
+	nom_tipo_mob varchar(30),   -- electrodomesticos"televisor,telefono", muebles"camas,sofa", baño"toallas,perfumes"
+	cantidad varchar(20),
+	FOREIGN key (nro_hab) REFERENCES habitacion(nro_hab) on delete cascade on update cascade
+);
+
+
+create table mobiliario(
+	cod_mob varchar(5) PRIMARY key,
+	cod_tipo_mob varchar(5),
+	nom_mueble varchar(50),
+	estado_mueble varchar(20), 	-- buen estado, mal estado
+	FOREIGN KEY (cod_Tipo_mob) REFERENCES tipo_mobiliario(cod_tipo_mob) on delete cascade on update cascade
+);
+
+
+create table reserva(
+	cod_reserva varchar(5) PRIMARY key,
+	fecha_inicio timestamp,
+	fecha_fin timestamp,
+	precio float,
+	cod_tipo_hab varchar(5),
+	num_doc varchar (10),
+	FOREIGN key (cod_tipo_hab) REFERENCES tipo_habitacion(cod_tipo_hab) on delete cascade on update cascade,
+	FOREIGN key (num_doc) REFERENCES persona(num_doc) on delete cascade on update cascade
+);
+
+
+create table servicios_adicionales(
+	cod_servicio varchar(5) PRIMARY KEY,
+	num_doc_cliente varchar(10),
+	FOREIGN KEY (num_doc_cliente) REFERENCES persona(num_doc) on delete cascade on update cascade
+);
+
+create table bar(id_bar varchar(3) primary key,
+	cod_servicio varchar(5) ,
+	nom_producto_bar varchar(50) ,
+	valor float,
+foreign key (cod_servicio) references servicios_adicionales(cod_servicio) on delete cascade on update cascade
+);
+ 
+create table restaurante(id_rest varchar(3) primary key,
+	cod_servicio varchar(5) ,
+	nom_producto_rest varchar(50) ,
+	valor float,
+	foreign key (cod_servicio) references servicios_adicionales(cod_servicio) on delete cascade on update cascade
+);
+
+create table zonas_humedas(id_zon_hum varchar(3) primary key,
+	cod_servicio varchar(5),
+	nom_servicio_zh varchar(50),
+	valor float,
+	foreign key (cod_servicio) references servicios_adicionales(cod_servicio) on delete cascade on update cascade
+);
+
+create table factura (
+	cod_factura varchar(5) PRIMARY key,
+	fecha_factura date,
+	metodo_pago varchar(30),
+	num_doc varchar(10),
+	cod_reserva varchar(5),
+	cod_servicio varchar(5),
+	FOREIGN key (cod_reserva) REFERENCES reserva(cod_reserva) on delete cascade on update cascade,
+	FOREIGN key (cod_servicio) references servicios_adicionales(cod_servicio) on delete cascade on update cascade,
+	FOREIGN key (num_doc) REFERENCES persona(num_doc) on delete cascade on update cascade
+);
+
+
+create table detalle_factura (
+	cod_det_factura varchar (5) primary key,
+	cod_factura varchar(5),
+	cod_servicios varchar (5),
+	fecha_hora date,
+	cantidad_serv_adquiridos int,
+	valor_total float,
+	FOREIGN key (cod_factura) REFERENCES factura(cod_factura) on delete cascade on update cascade,
+	FOREIGN key (cod_servicios) REFERENCES servicios_adicionales(cod_servicio) on delete cascade on update cascade
+);
+
+
+create table usuario_persona(
+	cod_usu_per varchar (10),
+	correo_electronico varchar(100),
+	num_doc varchar (10),
+	FOREIGN KEY (correo_electronico) REFERENCES usuarios(correo_electronico) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (num_doc) REFERENCES persona(num_doc) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+create table tipo_hab_reserva(
+	cod_tipo_hab_reserva varchar(5),
+	cod_tipo_hab varchar (5),
+	cod_reserva varchar(5),
+	FOREIGN KEY (cod_tipo_hab) REFERENCES tipo_habitacion(cod_tipo_hab) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (cod_reserva) REFERENCES reserva(cod_reserva) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+create table persona_servicios_adicionales(
+	cod_per_serv_adicionale varchar (10),
+	num_doc varchar (10),
+	cod_servicio varchar (5),
+	FOREIGN KEY (num_doc) REFERENCES persona(num_doc) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (cod_servicio) REFERENCES servicios_Adicionales(cod_servicio) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+create table habitacion_tipo_mobiliario(
+	cod_hab_tipo_mob varchar (5),
+	nro_hab varchar(5),
+	cod_tipo_mob varchar (5),
+	FOREIGN KEY (nro_hab) REFERENCES habitacion(nro_hab) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (cod_tipo_mob) REFERENCES tipo_mobiliario(cod_tipo_mob) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
